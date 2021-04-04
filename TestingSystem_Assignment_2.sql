@@ -5,109 +5,110 @@ USE TestingSystem;
 
 -- quesiton 1 : dinh danh phong ban --
 DROP TABLE IF EXISTS		Department;
-CREATE TABLE 				Department (
-    DepartmentID 			TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-	DepartmentName 			VARCHAR(50) NOT NULL
+CREATE TABLE IF NOT EXISTS			Department (
+    DepartmentID 			TINYINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	DepartmentName 			VARCHAR(50) NOT NULL UNIQUE KEY 
 );
 
 -- quesiton 2 : dinh danh chuc vu  -- 
 DROP TABLE IF EXISTS 		`position`;
- CREATE TABLE  				`Position` (
+ CREATE TABLE  IF NOT EXISTS				`Position` (
 	PositionID				TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-	PositionName			VARCHAR(50) NOT NULL 
+	PositionName			VARCHAR(50) NOT NULL UNIQUE KEY 
 );
 
-
+-- quesition 3 : dinh danh cua khach hang --
 DROP TABLE IF EXISTS 		`Account`;
- CREATE TABLE  				`Account`(
+ CREATE TABLE IF NOT EXISTS 				`Account`(
 	AccountID				TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-	Email					VARCHAR(50) NOT NULL,
-	Username				VARCHAR(50), NOT NULL UNIQUE KEY 
-	Fullname				VARCHAR(50), NOT NULL
-	DepartmentID			TINYINT  , NOT NULL
-	PositionID				TINYINT,
-	CreateDate          	DATETIME,
+	Email					VARCHAR(50) NOT NULL UNIQUE KEY ,
+	Username				VARCHAR(50) NOT NULL UNIQUE KEY ,
+	Fullname				VARCHAR(50 )NOT NULL UNIQUE KEY ,
+	DepartmentID			TINYINT UNSIGNED NOT NULL  ,
+	PositionID				TINYINT UNSIGNED,
+	CreateDate          	DATE NOT NULL DEFAULT now() ,
     FOREIGN KEY ( DepartmentID ) REFERENCES Department (DepartmentID), 
     FOREIGN KEY ( PositionID  )  REFERENCES Position (PositionID )
 );
 
---TRA LOI BAI 4--
+-- quesition 4 : dinh danh cua nhom --
 DROP TABLE IF EXISTS 		`Group`;
-CREATE TABLE   				`Group`(
+CREATE TABLE  IF NOT EXISTS 				`Group`(
 	GroupID					TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT ,
 	GroupName 				VARCHAR(50) NOT NULL UNIQUE KEY ,
-	CreatorID				TINYINT,
-	CreateDate         	 	DATETIME
+	CreatorID				TINYINT NOT NULL ,
+	CreateDate         	 	DATETIME NOT NULL DEFAULT now()
 );
 
---TRA LOI BAI 5--
+-- quesition 5 : dinh danh nhom khach hang su dung --
 DROP TABLE IF EXISTS 		GroupAccount;
-CREATE TABLE  				 GroupAccount(
-	GroupID					TINYINT UNSIGNED AUTO_INCREMENT,
-	AccountID				TINYINT,
-	JoinDate				DATE
-	FOREIGN KEY ( GroupID) REFERENCES `Group` (GroupID)
-    FOREIGN KEY (AccountID) REFERENCES `Account` (`AccountID`)
-    PRIMARY (  `Group`,`Account` )
+CREATE TABLE IF NOT EXISTS 				 GroupAccount(
+	GroupID					TINYINT UNSIGNED,
+	AccountID				TINYINT UNSIGNED,
+	JoinDate				DATE DEFAULT now() ,
+	FOREIGN KEY ( GroupID) REFERENCES `Group` (GroupID),
+    FOREIGN KEY (AccountID) REFERENCES `Account` (`AccountID`),
+    PRIMARY key  ( GroupID , AccountID)
 ); 
 
---tra loi bai 6 --
-DROP TABLE IF EXISTS 		TypeQuestion
- CREATE TABLE  				TypeQuestion(
+-- quesition  6 : dinh danh loai cau hoi --
+DROP TABLE IF EXISTS 		TypeQuestion;
+ CREATE TABLE IF NOT EXISTS 				TypeQuestion(
 	TypeID					SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	TypeName 				VARCHAR(50) NOT NULL
 );
 
---tra loi bai 7 --
+-- quesition 7  : dinh danh cua chu de cau hoi --
  DROP TABLE IF EXISTS  		CategoryQuestion;
-CREATE TABLE 				CategoryQuestion(
+CREATE TABLE IF NOT EXISTS 				CategoryQuestion(
 	CategoryID				TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	CategoryName 			VARCHAR(50) NOT NULL
 );  
 
---tra loi bai 8--
+-- quesition 8 : dinh danh cua cau hoi --
 DROP TABLE IF EXISTS        Question;
- CREATE TABLE  				Question(
+ CREATE TABLE IF NOT EXISTS  				Question(
 	QuestionID				TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT ,
-	Content					VARCHAR(50) NOT NULL ,
-	CategoryID				TINYINT NOT NULL,
-	TypeID					TINYINT NOT NULL, 
-	CreatorID				TINYINT NOT NULL,
-	CreateDate 		   	 	DATE,
-    FOREIGN KEY ( CategoryID) REFERENCES  Category ( CategoryID),
+	Content					VARCHAR(50) NOT NULL  UNIQUE KEY ,
+	CategoryID				TINYINT UNSIGNED NOT NULL, 
+	TypeID					SMALLINT UNSIGNED NOT NULL, 
+	CreatorID				TINYINT UNSIGNED NOT NULL,
+	CreateDate 		   	 	DATE NOT NULL DEFAULT now() ,
+    FOREIGN KEY ( CategoryID) REFERENCES  CategoryQuestion ( CategoryID),
     FOREIGN KEY ( TypeID ) REFERENCES  TypeQuestion (TypeID ) ,
-    FOREIGN KEY (CreatorID)  REFERENCES `Group` (CreatorID) 
+    FOREIGN KEY (CreatorID)  REFERENCES `Account` (AccountID) 
 );
 
--- tra loi bai 9
+-- quesiton 9 : dinh danh cua cau tra loi -- 
 DROP TABLE IF EXISTS        Answer;
- CREATE TABLE  				Answer(
+ CREATE TABLE IF NOT EXISTS  				Answer(
 	AnswerID				TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-	Content					VARCHAR(50) NOT NULL,
-	QuestionID				TINYINT NOT NULL,
-	IsCorrect				VARCHAR(50) NOT NULL,
+	Content					VARCHAR(50) NOT NULL unique key ,
+	QuestionID				TINYINT UNSIGNED NOT NULL,
+	IsCorrect				VARCHAR(50) NOT NULL unique key ,
      FOREIGN KEY (QuestionID) REFERENCES Question(QuestionID)
 );
    
-   -- tra loi bai 9--
+   -- quesiiton 10 : dinh danh cua de thi --
 DROP TABLE IF EXISTS 		Exam;
-CREATE TABLE   				Exam(
-	ExamID			    	SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-	`Code`					SMALLINT NOT NULL,
+CREATE TABLE IF NOT EXISTS   				Exam(
+	ExamID			    	TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`Code`					SMALLINT NOT NULL unique key ,
 	Title       			VARCHAR(100) NOT NULL,
-	CategoryID				SMALLINT NOT NULL,
-    Duration            	VARCHAR(50) NOT NULL,
-	CreatorID				SMALLINT NOT NULL ,
-	CreateDate 		    	DATE,
-    FOREIGN KEY (CategoryID)REFERENCES Category(CategoryID)  
+	CategoryID				TINYINT UNSIGNED NOT NULL,
+    Duration            	TINYINT UNSIGNED NOT NULL,
+	CreatorID				TINYINT UNSIGNED NOT NULL ,
+	CreateDate 		    	DATE DEFAULT now() ,
+    FOREIGN KEY (CategoryID) REFERENCES CategoryQuestion (CategoryID) ,
+    FOREIGN KEY (CreatorID)  REFERENCES `Account` (AccountID) 
 );    
 
---tra loi bai 10--
+-- question 11--
 DROP TABLE IF EXISTS 		ExamQuestion;
-CREATE TABLE  				ExamQuestion(
+CREATE TABLE  IF NOT EXISTS 				ExamQuestion(
 	ExamID			    	TINYINT UNSIGNED AUTO_INCREMENT,
-	QuestionID				TINYINT NOT NULL,
-    PRIMARY KEY ( Exam ,Question ),
+	QuestionID				TINYINT UNSIGNED NOT NULL,
+    PRIMARY KEY ( ExamID , QuestionID ),
     FOREIGN KEY  ( ExamID ) REFERENCES Exam ( ExamID),
-	FOREIGN KEY (QuestionID	) REFERENCES Question(QuestionID) );
-    
+	FOREIGN KEY (QuestionID	) REFERENCES Question(QuestionID) 
+ );   
